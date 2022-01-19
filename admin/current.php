@@ -1,5 +1,9 @@
 <?php
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
 
 <?php 
@@ -85,10 +89,12 @@ if ($_SESSION['RollNo']) {
                                     <?php
                                     if(isset($_POST['submit']))
                                         {$s=$_POST['title'];
-                                            $sql="select record.BookId,RollNo,Title,Due_Date,Date_of_Issue,datediff(curdate(),Due_Date) as x from LMS.record,LMS.book where (Date_of_Issue is NOT NULL and Date_of_Return is NULL and book.Bookid = record.BookId) and (RollNo='$s' or record.BookId='$s' or Title like '%$s%')";
+                                            // $sql="select record.BookId,RollNo,Title,Due_Date,Date_of_Issue,datediff(curdate(),Due_Date) as x from LMS.record,LMS.book where (Date_of_Issue is NOT NULL and Date_of_Return is NULL and book.Bookid = record.BookId) and (RollNo='$s' or record.BookId='$s' or Title like '%$s%')";
+                                            $sql="select *, datediff(curdate(),Due_Date) as x from LMS.record inner join LMS.user on user.RollNo = record.RollNo inner join LMS.book on book.BookId = record.BookId where (Date_of_Issue is NOT NULL and Date_of_Return is NULL and book.Bookid = record.BookId) and (record.RollNo='$s' or record.BookId='$s' or Title like '%$s%')";
                                         }
                                     else
-                                        $sql="select record.BookId,RollNo,Title,Due_Date,Date_of_Issue,datediff(curdate(),Due_Date) as x from LMS.record,LMS.book where Date_of_Issue is NOT NULL and Date_of_Return is NULL and book.Bookid = record.BookId";
+                                        // $sql="select record.BookId,RollNo,Title,Due_Date,Date_of_Issue,datediff(curdate(),Due_Date) as x from LMS.record,LMS.book where Date_of_Issue is NOT NULL and Date_of_Return is NULL and book.Bookid = record.BookId";
+                                        $sql="select *, datediff(curdate(),Due_Date) as x from LMS.record inner join LMS.user on user.RollNo = record.RollNo inner join LMS.book on book.BookId = record.BookId";
                                     $result=$conn->query($sql);
                                     $rowcount=mysqli_num_rows($result);
 
@@ -104,6 +110,7 @@ if ($_SESSION['RollNo']) {
                                     <tr>
                                       <th>Roll No</th>  
                                       <th>Book id</th>
+                                      <th>Name</th>
                                       <th>Book name</th>
                                       <th>Issue Date</th>
                                       <th>Due date</th>
@@ -121,6 +128,7 @@ if ($_SESSION['RollNo']) {
                             {
                                 $rollno=$row['RollNo'];
                                 $bookid=$row['BookId'];
+                                $username=$row['Name'];
                                 $name=$row['Title'];
                                 $issuedate=$row['Date_of_Issue'];
                                 $duedate=$row['Due_Date'];
@@ -131,6 +139,7 @@ if ($_SESSION['RollNo']) {
                                     <tr>
                                       <td><?php echo strtoupper($rollno) ?></td>
                                       <td><?php echo $bookid ?></td>
+                                      <td><?= $username ?></td>
                                       <td><?php echo $name ?></td>
                                       <td><?php echo $issuedate ?></td>
                                       <td><?php echo $duedate ?></td>

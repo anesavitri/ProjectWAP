@@ -1,6 +1,9 @@
 <?php
-ob_start();
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
 
 <?php 
@@ -161,7 +164,7 @@ if(isset($_POST['submit']))
     $name=$_POST['Name'];
     $email=$_POST['EmailId'];
     $mobno=$_POST['MobNo'];
-    $pswd=$_POST['Password'];
+    $pswd=md5($_POST['Password']);
 
 $sql1="update LMS.user set Name='$name', EmailId='$email', MobNo='$mobno', Password='$pswd' where RollNo='$rollno'";
 

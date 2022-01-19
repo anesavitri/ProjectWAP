@@ -1,5 +1,9 @@
 <?php
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
 
 <?php 
@@ -80,6 +84,7 @@ if ($_SESSION['RollNo']) {
                                   <thead>
                                     <tr>
                                       <th>Roll Number</th>
+                                      <th>Name</th>
                                       <th>Book Id</th>
                                       <th>Book Name</th>
                                       <th>Renewals Left</th>
@@ -88,11 +93,13 @@ if ($_SESSION['RollNo']) {
                                   </thead>
                                   <tbody>
                                     <?php
-                            $sql="select * from LMS.record,LMS.book,LMS.renew where renew.BookId=book.BookId and renew.RollNo=record.RollNo and renew.BookId=record.BookId";
+                            // $sql="select * from LMS.record,LMS.book,LMS.renew where renew.BookId=book.BookId and renew.RollNo=record.RollNo and renew.BookId=record.BookId";
+                            $sql="select * from LMS.renew inner join LMS.record on record.RollNo = renew.RollNo inner join LMS.book on book.BookId = renew.BookId inner join LMS.user on user.RollNo = renew.RollNo";
                             $result=$conn->query($sql);
                             while($row=$result->fetch_assoc())
                             {
                                 $bookid=$row['BookId'];
+                                $username=$row['Name'];
                                 $rollno=$row['RollNo'];
                                 $name=$row['Title'];
                                 $renewals=$row['Renewals_left'];
@@ -101,6 +108,7 @@ if ($_SESSION['RollNo']) {
                             ?>
                                     <tr>
                                       <td><?php echo strtoupper($rollno) ?></td>
+                                      <td><?= $username ?></td>
                                       <td><?php echo $bookid ?></td>
                                       <td><b><?php echo $name ?></b></td>
                                       <td><?php echo $renewals ?></td>

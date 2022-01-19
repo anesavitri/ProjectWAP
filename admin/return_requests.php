@@ -1,5 +1,9 @@
 <?php
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
 
 <?php 
@@ -80,6 +84,7 @@ if ($_SESSION['RollNo']) {
                                   <thead>
                                     <tr>
                                       <th>Roll Number</th>
+                                      <th>Name</th>
                                       <th>Book Id</th>
                                       <th>Book Name</th>
                                       <th>Dues</th>
@@ -88,11 +93,13 @@ if ($_SESSION['RollNo']) {
                                   </thead>
                                   <tbody>
                                     <?php
-                            $sql="select return.BookId,return.RollNo,Title,datediff(curdate(),Due_Date) as x from LMS.return,LMS.book,LMS.record where return.BookId=book.BookId and return.BookId=record.BookId and return.RollNo=record.RollNo";
+                            // $sql="select return.BookId,return.RollNo,Title,datediff(curdate(),Due_Date) as x from LMS.return,LMS.book,LMS.record where return.BookId=book.BookId and return.BookId=record.BookId and return.RollNo=record.RollNo";
+                            $sql="select *, datediff(curdate(),Due_Date) as x  from LMS.return inner join LMS.record on return.RollNo = record.RollNo inner join LMS.book on book.BookId = return.BookId inner join LMS.user on user.RollNo = return.Rollno";
                             $result=$conn->query($sql);
                             while($row=$result->fetch_assoc())
                             {
                                 $bookid=$row['BookId'];
+                                $username = $row['Name'];
                                 $rollno=$row['RollNo'];
                                 $name=$row['Title'];
                                 $dues=$row['x'];
@@ -102,6 +109,7 @@ if ($_SESSION['RollNo']) {
                             ?>
                                     <tr>
                                       <td><?php echo strtoupper($rollno) ?></td>
+                                      <td><?= $username ?></td>
                                       <td><?php echo $bookid ?></td>
                                       <td><b><?php echo $name ?></b></td>
                                       <td><?php 

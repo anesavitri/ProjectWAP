@@ -1,5 +1,9 @@
 <?php
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
 
 <?php 
@@ -80,6 +84,7 @@ if ($_SESSION['RollNo']) {
                                   <thead>
                                     <tr>
                                       <th>Roll Number</th>
+                                      <th>Name</th>
                                       <th>Book Id</th>
                                       <th>Book Name</th>
                                       <th>Availabilty</th>
@@ -88,7 +93,8 @@ if ($_SESSION['RollNo']) {
                                   </thead>
                                   <tbody>
                                     <?php
-                            $sql="select * from LMS.record,LMS.book where Date_of_Issue is NULL and record.BookId=book.BookId order by Time";
+                            // $sql="select * from LMS.record,LMS.book where Date_of_Issue is NULL and record.BookId=book.BookId order by Time";
+                            $sql="select * from LMS.record inner join LMS.book on book.BookId = record.BookId inner join LMS.user on user.RollNo = record.RollNo where Date_of_Issue is NULL and record.BookId=book.BookId order by Time";
                             $result=$conn->query($sql);
                             while($row=$result->fetch_assoc())
                             {
@@ -96,11 +102,13 @@ if ($_SESSION['RollNo']) {
                                 $rollno=$row['RollNo'];
                                 $name=$row['Title'];
                                 $avail=$row['Availability'];
+                                $username =$row['Name'];
                             
                                 
                             ?>
                                     <tr>
                                       <td><?php echo strtoupper($rollno) ?></td>
+                                      <td><?= $username ?></td>
                                       <td><?php echo $bookid ?></td>
                                       <td><b><?php echo $name ?></b></td>
                                       <td><?php echo $avail ?></td>

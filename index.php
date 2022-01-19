@@ -37,6 +37,7 @@ require('dbconn.php');
 		<div class="login">
 			<h2>Sign In</h2>
 			<form action="index.php" method="post">
+			<input type="text" Name="Name" placeholder="Name" required>
 				<input type="text" Name="RollNo" placeholder="RollNo" required="">
 				<input type="password" Name="Password" placeholder="Password" required="">
 			
@@ -81,8 +82,9 @@ require('dbconn.php');
 
 <?php
 if(isset($_POST['signin']))
-{$u=$_POST['RollNo'];
- $p=$_POST['Password'];
+{$n=$_POST['Name'];
+ $u=$_POST['RollNo'];
+ $p=md5($_POST['Password']);
  $c=$_POST['Category'];
 
  $sql="select * from LMS.user where RollNo='$u'";
@@ -91,15 +93,20 @@ if(isset($_POST['signin']))
 $row = $result->fetch_assoc();
 $x=$row['Password'];
 $y=$row['Type'];
+$z=$row['Name'];
 if(strcasecmp($x,$p)==0 && !empty($u) && !empty($p))
   {//echo "Login Successful";
    $_SESSION['RollNo']=$u;
    
 
-  if($y=='Admin')
-   header('location:admin/index.php');
-  else
+  if($y=='Admin'){
+	  $_SESSION['isAdmin'] = true;
+	  header('location:admin/index.php');
+  }
+  else{
+  	$_SESSION['isStudent'] = true;
   	header('location:student/index.php');
+  }
         
   }
 else 
@@ -113,7 +120,7 @@ if(isset($_POST['signup']))
 {
 	$name=$_POST['Name'];
 	$email=$_POST['Email'];
-	$password=$_POST['Password'];
+	$password=md5($_POST['Password']);
 	$mobno=$_POST['PhoneNumber'];
 	$rollno=$_POST['RollNo'];
 	$category=$_POST['Category'];

@@ -1,7 +1,10 @@
 <?php
 require('dbconn.php');
+if(empty($_SESSION['isAdmin'])) {
+    echo "Error(403): Forbidden";
+    die;
+}
 ?>
-
 <?php 
 if ($_SESSION['RollNo']) {
     ?>
